@@ -1,0 +1,15 @@
+apiVersion:                              v1
+kind:                                    ConfigMap
+metadata:
+  name:                                  bike-config
+  namespace:                             default
+data:
+  DB_USER: airflow
+  DB_SCHEMA: airflow
+  SCHEMA_R_URL: http://sandbox-hdp.hortonworks.com:7788
+  TOPIC: scala_latest
+  BROKERS: sandbox-hdp.hortonworks.com:6667
+  FORMAT: avro
+  HDP_IP: 10.132.0.23
+  INTERVAL: "60"
+  HDP_DOMAIN_NAME: sandbox-hdp.hortonworks.com

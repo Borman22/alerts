@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alerts-filter
+  labels:
+    app: alerts-filter
+    owner: alex_p
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: alerts-filter
+  template:
+    metadata:
+      labels:
+        app: alerts-filter
+    spec:
+      nodeSelector:
+        ROLES: worker
+      containers:
+        - name: alerts-filter
+          image: lordofthebikes/alerts_filter:latest
+          env:
+            - name:              APPLICATION_ID
+              value:             "AlertsFilter"
+            - name:              BROKERS
+              valueFrom:
+                configMapKeyRef:
+                  name:          bike-config
+                  key:           BROKERS
+            - name:              SCHEMA_R_URL
+              valueFrom:
+                configMapKeyRef:
+                  name:          bike-config
+                  key:           SCHEMA_R_URL
+            - name:              TOPIC
+              value:             "initial_data_avro_k8s"
+#            valueFrom:
+#              configMapKeyRef:
+#                name:          bike-config
+#                key:           TOPIC
+            - name:              OUTPUT_TOPIC
+              value:             "alerts_k8s"
+
+            - name:              HDP_IP
+              valueFrom:
+                configMapKeyRef:
+                  name:          bike-config
+                  key:           HDP_IP
+            - name:              HDP_DOMAIN_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name:          bike-config
+                  key:           HDP_DOMAIN_NAME
+
