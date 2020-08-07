@@ -33,7 +33,7 @@ spec:
                 configMapKeyRef:
                   name:          bike-config
                   key:           SCHEMA_R_URL
-            - name:              TOPIC
+            - name:              INPUT_TOPIC
               value:             "initial_data_avro_k8s"
 #            valueFrom:
 #              configMapKeyRef:
