@@ -3,6 +3,9 @@ FROM maven:3.6.3-jdk-8
 RUN mkdir -p /usr/src/app/
 WORKDIR /usr/src/app/
 
+RUN mkdir /var/log/AlertsFilter
+RUN chmod 777 /var/log/AlertsFilter
+
 RUN git clone https://github.com/Borman22/alerts.git
 WORKDIR /usr/src/app/alerts/
 # COPY ./ ./
