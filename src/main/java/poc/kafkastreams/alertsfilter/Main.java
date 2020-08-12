@@ -12,6 +12,8 @@ import org.apache.kafka.streams.kstream.Consumed;
 
 import java.util.Collections;
 import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class Main {
@@ -22,6 +24,7 @@ public class Main {
     public static String inputTopic = "test_avro";
     public static String outputTopic = "alerts";
 
+    private static final Logger logger = LoggerFactory.getLogger("alertsFilterLogger");
 
     public static void main(String[] args) {
 
@@ -47,11 +50,14 @@ public class Main {
                 }
         }
 
-        System.out.println("applicationId = " + applicationId);
-        System.out.println("brokers = " + brokers);
-        System.out.println("schemaRegistryUrl = " + schemaRegistryUrl);
-        System.out.println("inputTopic = " + inputTopic);
-        System.out.println("outputTopic = " + outputTopic);
+        logger.info(
+                "AlertsFilter started with parameters: " +
+                "applicationId = " + applicationId +
+                ", brokers = " + brokers +
+                ", schemaRegistryUrl = " + schemaRegistryUrl +
+                ", inputTopic = " + inputTopic +
+                ", outputTopic = " + outputTopic
+        );
 
         StreamsBuilder builder = new StreamsBuilder();
 
@@ -66,12 +72,16 @@ public class Main {
         final Serde<GenericRecord> valueSerde = new GenericAvroSerde();
         valueSerde.configure(Collections.singletonMap(AbstractKafkaSchemaSerDeConfig.SCHEMA_REGISTRY_URL_CONFIG, schemaRegistryUrl), false);
 
-        builder
-                .stream(inputTopic, Consumed.with(Serdes.String(), valueSerde))
-                .filter((k, v) -> (int)v.get("num_docks_available") <= 0 || (int)v.get("num_ebikes_available") + (int)v.get("num_bikes_available") >= (int)v.get("capacity"))
-                .to(outputTopic);
+        try {
+            builder
+                    .stream(inputTopic, Consumed.with(Serdes.String(), valueSerde))
+                    .filter((k, v) -> (int) v.get("num_docks_available") < 4 || (int) v.get("num_ebikes_available") + (int) v.get("num_bikes_available") < 4)
+                    .to(outputTopic);
 
-        final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
-        streams.start();
+            final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
+            streams.start();
+        } catch (Exception e){
+            logger.error("An exception occurred in AlertsFilter:", e);
+        }
     }
 }
