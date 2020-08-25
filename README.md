@@ -19,13 +19,21 @@ Kafka message has KEY (string) equals "station_id" and VALUE which stores all da
 
 ## Installation
 
-Download the Dockerfile in a certain folder, change parameters according to your requirements. Run the command in this folder:
+Clone the repository 
+```bash
+https://gitlab.com/Yulia_Krawtschenko/bikerenting.git
+cd bikerenting/
+git checkout develop
+cd alerts_filter
+```
+
+Run the command in this folder:
 
 ```bash
-docker build -t alerts .
+docker build -t alerts_filter .
 ```
 And then:
 
 ```bash
-docker run --rm --name alerts alerts
+docker run --rm --name alerts_filter alerts_filter
 ```

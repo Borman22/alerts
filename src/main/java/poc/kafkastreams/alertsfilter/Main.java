@@ -12,8 +12,9 @@ import org.apache.kafka.streams.kstream.Consumed;
 
 import java.util.Collections;
 import java.util.Properties;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 
 public class Main {
@@ -24,7 +25,8 @@ public class Main {
     public static String inputTopic = "test_avro";
     public static String outputTopic = "alerts";
 
-    private static final Logger logger = LoggerFactory.getLogger("alertsFilterLogger");
+
+    private static Logger logger = LogManager.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
 
@@ -76,12 +78,13 @@ public class Main {
             builder
                     .stream(inputTopic, Consumed.with(Serdes.String(), valueSerde))
                     .filter((k, v) -> (int) v.get("num_docks_available") < 4 || (int) v.get("num_ebikes_available") + (int) v.get("num_bikes_available") < 4)
+                    .peek((k, v) -> logger.info("New alert sent to Kafka: " + v))
                     .to(outputTopic);
 
             final KafkaStreams streams = new KafkaStreams(builder.build(), streamsConfiguration);
             streams.start();
         } catch (Exception e){
-            logger.error("An exception occurred in AlertsFilter:", e);
+            logger.error("An exception occurred in AlertsFilter: ", e);
         }
     }
 }
